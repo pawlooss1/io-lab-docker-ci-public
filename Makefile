@@ -8,7 +8,7 @@ REPO_NAME = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cu
 # Image metadata
 
 # Name of the repository
-SCHEMA_NAME = $(PREFIX)/$(REPO_NAME)
+SCHEMA_NAME = pawdlu/$(REPO_NAME)
 SCHEMA_DESCRIPTION = My image!
 SCHEMA_URL = http://example.com
 
@@ -22,13 +22,12 @@ SCHEMA_VCS_REF = $(shell git rev-parse --short HEAD)
 
 SCHEMA_BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-SCHEMA_BUILD_VERSION = your app version - framework specyfic
-SCHEMA_CMD = the command your run this container with
+SCHEMA_BUILD_VERSION = 1.0
+SCHEMA_CMD = docker run
 
 all: push
 
 image:
-  # TODO: this build command is incomplete, add last flag of this command that tags image as latest upon building it
 	docker build \
 		--build-arg SCHEMA_NAME="$(SCHEMA_NAME)" \
 		--build-arg SCHEMA_DESCRIPTION="$(SCHEMA_DESCRIPTION)" \
@@ -39,11 +38,13 @@ image:
 		--build-arg SCHEMA_BUILD_DATE="$(SCHEMA_BUILD_DATE)" \
 		--build-arg SCHEMA_BUILD_VERSION="$(SCHEMA_BUILD_VERSION)" \
 		--build-arg SCHEMA_CMD="$(SCHEMA_CMD)" \
+		-t $(SCHEMA_NAME):latest .
 	
-  # TODO: last part of this command that tags just built image with a specyfic tag
+	docker tag $(SCHEMA_NAME):latest $(SCHEMA_NAME):$(TAG)
 	
 push: image
-	# TODO: two commands, first pushes the latest image, second pushes the image tagged with specyfic tag
+	docker push $(SCHEMA_NAME):latest
+	docker push $(SCHEMA_NAME):$(TAG)
 	
 clean:
 
